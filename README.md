@@ -1,1 +1,1 @@
-# stock-sentiment-scraper
+# Stock Sentiment Scraper
