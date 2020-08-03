@@ -1,9 +1,11 @@
 import datetime
 import numpy as np
+import pandas as pd
 import requests
 
-from collections import Counter
+from collections import Counter, OrderedDict
 from dateutil.parser import parse
+from operator import itemgetter
 from selenium import webdriver
 
 def grab_html():
@@ -84,7 +86,7 @@ def get_stock_count(comments, stocks_list):
 
     for a in comments['data']:
         for ticker in stocks_list:
-            word = " " + ticker
+            word = " " + ticker + " "
             if word in a['body']:
                 stock_dict[ticker] += 1
     stock_dict = dict(stock_dict)
@@ -99,4 +101,9 @@ if __name__ == "__main__":
     comments = get_all_comments()
 
     stock_count = get_stock_count(comments, stocks_list)
-    print(stock_count)
+
+    sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
+    top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
+
+    df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
+    print(df)
