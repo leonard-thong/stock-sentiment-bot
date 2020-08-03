@@ -28,9 +28,13 @@ def grab_stocklink(driver):
         if a.text.startswith('Weekend'):
             date = "".join(a.text.split(' ')[-3:])
             parsed = parse(date)
-            yesterday = datetime.date.today() - datetime.timedelta(days=3)
+            yesterday = datetime.date.today() - datetime.timedelta(days=1)
+            twodaysago = datetime.date.today() - datetime.timedelta(days=2)
+            threedaysago = datetime.date.today() - datetime.timedelta(days=3)
 
-            if parse(str(yesterday)) == parsed:
+            if (parse(str(yesterday)) == parsed or
+                    parse(str(twodaysago)) == parsed or
+                    parse(str(threedaysago)) == parsed):
                 link = a.find_element_by_xpath('../..').get_attribute('href')
 
     stock_link = link.split('/')[-3]
