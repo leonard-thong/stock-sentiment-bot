@@ -84,7 +84,8 @@ def get_stock_count(comments, stocks_list):
 
     for a in comments['data']:
         for ticker in stocks_list:
-            if ticker in a['body'].split():
+            word = " " + ticker
+            if word in a['body']:
                 stock_dict[ticker] += 1
     stock_dict = dict(stock_dict)
     return stock_dict
