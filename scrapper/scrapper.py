@@ -1,4 +1,5 @@
 import datetime
+import json
 import numpy as np
 import pandas as pd
 import requests
@@ -70,7 +71,6 @@ def get_all_comments():
     i = 0
     while i < len(list):
         print(len(list))
-
         new_comments_list = ",".join(list[0:1000])
         new_comments = get_comments(new_comments_list)
 
@@ -92,6 +92,10 @@ def get_stock_count(comments, stocks_list):
     stock_dict = dict(stock_dict)
     return stock_dict
 
+def output_comments(comments):
+    with open('../sentiment/comments.txt', 'w') as f:
+        f.write(json.dumps(comments))
+
 if __name__ == "__main__":
     driver = grab_html()
     stock_link = grab_stocklink(driver)
@@ -100,10 +104,12 @@ if __name__ == "__main__":
     raw_comment_id_list = grab_comment_id_list(stock_link)
     comments = get_all_comments()
 
-    stock_count = get_stock_count(comments, stocks_list)
+    # stock_count = get_stock_count(comments, stocks_list)
+    #
+    # sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
+    # top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
+    #
+    # df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
+    # print(df)
 
-    sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
-    top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
-
-    df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
-    print(df)
+    output_comments(comments)
