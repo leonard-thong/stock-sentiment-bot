@@ -104,12 +104,13 @@ if __name__ == "__main__":
     raw_comment_id_list = grab_comment_id_list(stock_link)
     comments = get_all_comments()
 
-    # stock_count = get_stock_count(comments, stocks_list)
-    #
-    # sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
-    # top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
-    #
-    # df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
-    # print(df)
-
     output_comments(comments)
+
+    # graph
+    stock_count = get_stock_count(comments, stocks_list)
+
+    sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
+    top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
+
+    df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
+    print(df)
