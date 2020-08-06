@@ -17,7 +17,7 @@ def grab_html():
     return driver
 
 
-def grab_stocklink(driver):
+def grab_stock_link(driver):
     links = driver.find_elements_by_xpath('//*[@class="_eYtD2XCVieq6emjKBH3m"]')
     link = ""
 
@@ -107,7 +107,7 @@ def output_comments(comments):
 
 if __name__ == "__main__":
     driver = grab_html()
-    stock_link = grab_stocklink(driver)
+    stock_link = grab_stock_link(driver)
     stocks_list = grab_stocks()
 
     raw_comment_id_list = grab_comment_id_list(stock_link)
