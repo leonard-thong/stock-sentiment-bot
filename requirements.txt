@@ -2,8 +2,13 @@
 # $ conda create --name <env> --file <this file>
 # platform: osx-64
 blas=1.0=mkl
+brotlipy=0.7.0=py38haf1e3a3_1000
 ca-certificates=2020.6.24=0
 certifi=2020.6.20=py38_0
+cffi=1.14.0=py38hc512035_1
+chardet=3.0.4=py38_1003
+cryptography=2.9.2=py38ha12b0ac_0
+idna=2.10=py_0
 intel-openmp=2019.4=233
 libcxx=10.0.0=1
 libedit=3.1.20191231=h1de35cc_1
@@ -16,13 +21,22 @@ ncurses=6.2=h0a44026_1
 numpy=1.19.1=py38h3b9f5b6_0
 numpy-base=1.19.1=py38hcfb5961_0
 openssl=1.1.1g=h1de35cc_0
+pandas=1.0.5=py38h959d312_0
 pip=20.1.1=py38_1
+pycparser=2.20=py_2
+pyopenssl=19.1.0=py_1
+pysocks=1.7.1=py38_1
 python=3.8.5=h26836e1_0
+python-dateutil=2.8.1=py_0
+pytz=2020.1=py_0
 readline=8.0=h1de35cc_0
+requests=2.24.0=py_0
+selenium=3.141.0=py38h1de35cc_1001
 setuptools=49.2.0=py38_0
 six=1.15.0=py_0
 sqlite=3.32.3=hffcf06c_0
 tk=8.6.10=hb0a8c7a_0
+urllib3=1.25.9=py_0
 wheel=0.34.2=py38_0
 xz=5.2.5=h1de35cc_0
 zlib=1.2.11=h1de35cc_3
