@@ -102,7 +102,7 @@ def data_cleansing(comments, stocks_list):
 def get_stock_count(comments, stocks_list):
     stock_dict = Counter()
 
-    for a in comments["data"]:
+    for a in comments:
         for ticker in stocks_list:
             word = " " + ticker + " "
             if word in a['body']:
@@ -117,19 +117,29 @@ def output_comments(comments):
 
 
 if __name__ == "__main__":
+    # grab html
     driver = grab_html()
-    stock_link = grab_stock_link(driver)
-    stocks_list = grab_stocks()
 
+    # grab comments link
+    stock_link = grab_stock_link(driver)
+
+    # grab raw comments from comments link
     raw_comment_id_list = grab_comment_id_list(stock_link)
+
+    # grab all comments
     comments = get_all_comments()
 
-    comments["data"] = data_cleansing(comments, stocks_list)
+    # grab ticker list
+    stocks_list = grab_stocks()
 
-    output_comments(comments)
+    # cleaning the data
+    cleansed_comments = data_cleansing(comments, stocks_list)
 
-    # graph
-    stock_count = get_stock_count(comments, stocks_list)
+    # output the comments
+    output_comments(cleansed_comments)
+
+    # print top ten stocks
+    stock_count = get_stock_count(cleansed_comments, stocks_list)
 
     sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
     top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
