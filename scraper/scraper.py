@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 import numpy as np
@@ -112,8 +113,13 @@ def get_stock_count(comments, stocks_list):
 
 
 def output_comments(comments):
-    with open('../sentiment/comments.txt', 'w') as f:
-        f.write(json.dumps(comments))
+    data_list = [["index", "comment"]]
+    for i, comment in enumerate(comments):
+        data_list.append([i, comment["body"]]);
+
+    with open('../sentiment/comments.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data_list)
 
 
 if __name__ == "__main__":
