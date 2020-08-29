@@ -88,10 +88,21 @@ def get_all_comments():
     return comments
 
 
+def data_cleansing(comments, stocks_list):
+    cleansed = []
+    for a in comments['data']:
+        for ticker in stocks_list:
+            word = " " + ticker + " "
+            if word in a['body']:
+                cleansed.append(a)
+
+    return cleansed
+
+
 def get_stock_count(comments, stocks_list):
     stock_dict = Counter()
 
-    for a in comments['data']:
+    for a in comments["data"]:
         for ticker in stocks_list:
             word = " " + ticker + " "
             if word in a['body']:
@@ -112,6 +123,8 @@ if __name__ == "__main__":
 
     raw_comment_id_list = grab_comment_id_list(stock_link)
     comments = get_all_comments()
+
+    comments["data"] = data_cleansing(comments, stocks_list)
 
     output_comments(comments)
 
