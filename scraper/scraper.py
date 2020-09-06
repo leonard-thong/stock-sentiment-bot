@@ -112,10 +112,17 @@ def get_stock_count(comments, stocks_list):
     return stock_dict
 
 
+def get_ticker(comment):
+    for ticker in stocks_list:
+        word = " " + ticker + " "
+        if word in comment["body"]:
+            return ticker
+
+
 def output_comments(comments):
-    data_list = [["index", "comment"]]
+    data_list = [["index", "comment", "ticker"]]
     for i, comment in enumerate(comments):
-        data_list.append([i, comment["body"]]);
+        data_list.append([i, comment["body"], get_ticker(comment)])
 
     with open('../sentiment/comments.csv', 'w', newline='') as file:
         writer = csv.writer(file)
