@@ -1,1 +1,1 @@
-# Stock Sentiment Scraper
+# Stock Sentiment API
