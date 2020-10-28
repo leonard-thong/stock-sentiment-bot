@@ -1,1 +1,1 @@
-# Stock Sentiment API
+# Stock Sentiment Backend
