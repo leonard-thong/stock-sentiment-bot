@@ -73,6 +73,7 @@ def get_all_comments_id(submissions_id):
 
 
 def get_all_comments(comments_id):
+    comments_number = len(comments_id)
     comments_id = np.array(comments_id)
     comments = []
 
@@ -80,7 +81,7 @@ def get_all_comments(comments_id):
     # to fit the pushshift API requirement
     i = 0
     while i < len(comments_id):
-        print(len(comments_id))
+        print(str(len(comments_id)) + " / " + str(comments_number))
         next_comments_list = ",".join(comments_id[0:1000])
         next_comments = _get_comments(next_comments_list)
         comments += next_comments
