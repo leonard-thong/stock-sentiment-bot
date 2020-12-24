@@ -132,4 +132,4 @@ fabric.properties
 .idea/codestream.xml
 
 # credentials
-prawAPI.py
+scraper/config.json
