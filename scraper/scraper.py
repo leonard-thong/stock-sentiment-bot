@@ -59,15 +59,12 @@ def get_all_submissions_id(subreddit):
 
 def get_all_comments_id(submissions_id):
     comments_id = []
-    num = 0
 
     for submission_id in submissions_id:
         html = requests.get(f'https://api.pushshift.io/reddit/submission/comment_ids/{submission_id}')
         curr_comments_id = html.json()["data"]
 
         comments_id += curr_comments_id
-        num+=1
-        if num==3: break
 
     return comments_id
 
