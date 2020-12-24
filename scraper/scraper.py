@@ -95,12 +95,11 @@ def get_all_comments(comments_id):
 def _get_comments(comments_id):
     try:
         html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
-        next_comments = html.json()['data']
+        comments = html.json()['data']
     except:
         pass
 
-
-    return next_comments
+    return comments
 
 
 def clean_comments(comments, tickers):
