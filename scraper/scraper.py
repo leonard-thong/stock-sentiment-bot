@@ -1,161 +1,151 @@
 import csv
-import datetime
-
-import numpy as np
-import pandas as pd
+import json
+import praw
+import re
 import requests
+import numpy as np
 
-from collections import Counter, OrderedDict
-from dateutil.parser import parse
-from operator import itemgetter
-from selenium import webdriver
+from datetime import datetime, timedelta
 
 
-def grab_html():
-    url = 'https://www.reddit.com/r/wallstreetbets/search/?q=flair%3A%22Discussion%22&restrict_sr=1'
-    driver = webdriver.Chrome()
-    driver.get(url)
-    return driver
+def get_subreddit(name):
+    if name == "":
+        sub = "wallstreetbets"
+
+    with open("config.json") as json_data_file:
+        data = json.load(json_data_file)
+
+    # create reddit instance
+    reddit = praw.Reddit(client_id=data["login"]["client_id"], client_secret=data["login"]["client_secret"],
+                         username=data["login"]["username"], password=data["login"]["password"],
+                         user_agent=data["login"]["user_agent"])
+
+    # create a subreddit instance
+    subreddit = reddit.subreddit(name)
+    return subreddit
 
 
-def grab_stock_link(driver):
-    links = driver.find_elements_by_xpath('//*[@class="_eYtD2XCVieq6emjKBH3m"]')
-    link = ""
-
-    for a in links:
-        if a.text.startswith('Daily Discussion Thread'):
-            date = "".join(a.text.split(' ')[-3:])
-            parsed = parse(date)
-            yesterday = datetime.date.today() - datetime.timedelta(days=1)
-
-            if parse(str(yesterday)) == parsed:
-                link = a.find_element_by_xpath('../..').get_attribute('href')
-
-        if a.text.startswith('Weekend'):
-            date = "".join(a.text.split(' ')[-3:])
-            parsed = parse(date)
-            yesterday = datetime.date.today() - datetime.timedelta(days=1)
-            twodaysago = datetime.date.today() - datetime.timedelta(days=2)
-            threedaysago = datetime.date.today() - datetime.timedelta(days=3)
-
-            if (parse(str(yesterday)) == parsed or
-                    parse(str(twodaysago)) == parsed or
-                    parse(str(threedaysago)) == parsed):
-                link = a.find_element_by_xpath('../..').get_attribute('href')
-
-    stock_link = link.split('/')[-3]
-    driver.close()
-
-    return stock_link
-
-
-def grab_stocks():
+def get_tickers():
     with open('tickers.txt', 'r') as w:
-        stocks = w.readlines()
-        stocks_list = []
-        for a in stocks:
-            a = a.replace('\n', '')
-            stocks_list.append(a)
-        return stocks_list
+        tickers = w.readlines()
+        tickers_list = []
+
+        for ticker in tickers:
+            ticker = ticker.replace('\n', '')
+            tickers_list.append(ticker)
+
+        return tickers_list
 
 
-def grab_comment_id_list(stock_link):
-    html = requests.get(f'https://api.pushshift.io/reddit/submission/comment_ids/{stock_link}')
-    raw_comment_id_list = html.json()
-    return raw_comment_id_list
+def get_all_submissions_id(subreddit):
+    # scrape submissions created from 9pm two days ago to 9pm one day ago at 12 midnight
+    # this is to avoid scraping newly created submissions
+    current_time = datetime.now() + timedelta(hours=10)
+
+    submissions_id = []
+
+    for submission in subreddit.new(limit=1000):
+        submission_date = datetime.utcfromtimestamp(submission.created)
+        submission_delta = current_time - submission_date
+
+        link = 'www.reddit.com' + submission.permalink
+        submission_delta = str(submission_delta)
+
+        if 'day' not in submission_delta:
+            submissions_id.append(link.split('/')[-3])
+
+    return submissions_id
 
 
-def get_comments(comment_id_list):
-    html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comment_id_list}&fields=body&size=1000')
-    new_comments = html.json()
-    return new_comments
+def get_all_comments_id(submissions_id):
+    comments_id = []
+    num = 0
+
+    for submission_id in submissions_id:
+        html = requests.get(f'https://api.pushshift.io/reddit/submission/comment_ids/{submission_id}')
+        curr_comments_id = html.json()["data"]
+
+        comments_id += curr_comments_id
+        num+=1
+        if num==3: break
+
+    return comments_id
 
 
-def get_all_comments():
-    list = np.array(raw_comment_id_list['data'])
-    comments = {'data': []}
+def get_all_comments(comments_id):
+    comments_id = np.array(comments_id)
+    comments = []
 
+    # split the comments id to a group of 1000
+    # to fit the pushshift API requirement
     i = 0
-    while i < len(list):
-        print(len(list))
-        new_comments_list = ",".join(list[0:1000])
-        new_comments = get_comments(new_comments_list)
-
-        comments['data'] += new_comments['data']
+    while i < len(comments_id):
+        next_comments_list = ",".join(comments_id[0:1000])
+        next_comments = _get_comments(next_comments_list)
+        comments += next_comments
 
         remove_me = slice(0, 1000)
-        list = np.delete(list, remove_me)
+        comments_id = np.delete(comments_id, remove_me)
 
     return comments
 
 
-def data_cleansing(comments, stocks_list):
+def _get_comments(comments_id):
+    html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
+    next_comments = html.json()['data']
+    return next_comments
+
+
+def clean_comments(comments, tickers):
     cleansed = []
-    for a in comments['data']:
-        for ticker in stocks_list:
-            word = " " + ticker + " "
-            if word in a['body']:
-                cleansed.append(a)
+
+    for comment in comments:
+        for ticker in tickers:
+            if _check_comment(ticker, comment['body']):
+                cleansed.append(re.sub(r"\s", " ", comment['body']))
+                break
 
     return cleansed
 
 
-def get_stock_count(comments, stocks_list):
-    stock_dict = Counter()
-
-    for a in comments:
-        for ticker in stocks_list:
-            word = " " + ticker + " "
-            if word in a['body']:
-                stock_dict[ticker] += 1
-    stock_dict = dict(stock_dict)
-    return stock_dict
-
-
-def get_ticker(comment):
-    for ticker in stocks_list:
-        word = " " + ticker + " "
-        if word in comment["body"]:
-            return ticker
+def _check_comment(word, body):
+    return re.compile(r'\b({0})\b'.format(word), flags=re.IGNORECASE).search(body) is not None
 
 
 def output_comments(comments):
-    data_list = [["index", "comment", "ticker"]]
+    data_list = [["index", "comment"]]
     for i, comment in enumerate(comments):
-        data_list.append([i, comment["body"], get_ticker(comment)])
+        data_list.append([i, comment])
 
     with open('../sentiment/comments.csv', 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_list)
 
 
+def run(name):
+    # create subreddit instance
+    subreddit = get_subreddit(name)
+
+    # get tickers list
+    tickers = get_tickers()
+
+    #get all submissions id within the last 24 hours
+    submissions_id = get_all_submissions_id(subreddit)
+
+    # get all comments id from all the submissions
+    comments_id = get_all_comments_id(submissions_id)
+
+    # get all comments from the comments id
+    comments = get_all_comments(comments_id)
+
+    # remove comments that did not mention any tickers
+    comments = clean_comments(comments, tickers)
+
+    # output comments to csv file
+    output_comments(comments)
+
+
 if __name__ == "__main__":
-    # grab html
-    driver = grab_html()
+    name = "wallstreetbets"
 
-    # grab comments link
-    stock_link = grab_stock_link(driver)
-
-    # grab raw comments from comments link
-    raw_comment_id_list = grab_comment_id_list(stock_link)
-
-    # grab all comments
-    comments = get_all_comments()
-
-    # grab ticker list
-    stocks_list = grab_stocks()
-
-    # cleaning the data
-    cleansed_comments = data_cleansing(comments, stocks_list)
-
-    # output the comments
-    output_comments(cleansed_comments)
-
-    # print top ten stocks
-    stock_count = get_stock_count(cleansed_comments, stocks_list)
-
-    sorted_stock_count = OrderedDict(sorted(stock_count.items(), key=itemgetter(1), reverse=True))
-    top_ten_stock = {k: sorted_stock_count[k] for k in list(sorted_stock_count)[:10]}
-
-    df = pd.DataFrame(top_ten_stock.items(), columns=["ticker", "count"])
-    print(df)
+    run(name)
