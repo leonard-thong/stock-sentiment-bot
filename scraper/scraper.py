@@ -61,10 +61,13 @@ def get_all_comments_id(submissions_id):
     comments_id = []
 
     for submission_id in submissions_id:
-        html = requests.get(f'https://api.pushshift.io/reddit/submission/comment_ids/{submission_id}')
-        curr_comments_id = html.json()["data"]
+        try:
+            html = requests.get(f'https://api.pushshift.io/reddit/submission/comment_ids/{submission_id}')
+            curr_comments_id = html.json()["data"]
 
-        comments_id += curr_comments_id
+            comments_id += curr_comments_id
+        except:
+            pass
 
     return comments_id
 
@@ -77,6 +80,7 @@ def get_all_comments(comments_id):
     # to fit the pushshift API requirement
     i = 0
     while i < len(comments_id):
+        print(len(comments_id))
         next_comments_list = ",".join(comments_id[0:1000])
         next_comments = _get_comments(next_comments_list)
         comments += next_comments
@@ -88,9 +92,12 @@ def get_all_comments(comments_id):
 
 
 def _get_comments(comments_id):
-    html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
-    if html.json() is not None:
+    try:
+        html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
         next_comments = html.json()['data']
+    except:
+        pass
+
 
     return next_comments
 
