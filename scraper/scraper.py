@@ -89,7 +89,9 @@ def get_all_comments(comments_id):
 
 def _get_comments(comments_id):
     html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
-    next_comments = html.json()['data']
+    if html.json() is not None:
+        next_comments = html.json()['data']
+
     return next_comments
 
 
