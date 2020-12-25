@@ -132,4 +132,4 @@ fabric.properties
 .idea/codestream.xml
 
 # credentials
-scraper/config.json
+config.json

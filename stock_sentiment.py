@@ -127,7 +127,12 @@ def clean_comments(comments, tickers):
 
 
 def _check_comment(word, body):
-    return re.compile(r'\b({0})\b'.format(word), flags=re.IGNORECASE).search(body) is not None
+    try:
+        return re.compile(r'\b({0})\b'.format(word), flags=re.IGNORECASE).search(body) is not None
+    except:
+        pass
+
+    return False
 
 
 def _create_dict():
@@ -181,7 +186,7 @@ def analyze(comments):
 
 
 def output_result(comments):
-    with open("../sentiment/result.json", "w") as outfile:
+    with open("result.json", "w") as outfile:
         json.dump(comments, outfile, indent=4)
 
 
