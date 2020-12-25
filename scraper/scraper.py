@@ -3,10 +3,13 @@ import json
 import praw
 import re
 import requests
+import nltk
 import numpy as np
 
 from csv import reader
 from datetime import datetime, timedelta
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+nltk.download('vader_lexicon')
 
 
 def get_subreddit(name):
@@ -106,7 +109,7 @@ def _get_comments(comments_id):
     return []
 
 
-def output_comments(comments, tickers):
+def clean_comments(comments, tickers):
     result = _create_dict()
     confused_tickers = []
 
@@ -119,9 +122,6 @@ def output_comments(comments, tickers):
                 if _check_comment(result[ticker]["symbol"], comment['body']):
                     result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
                     result[ticker]["total_count"] += 1
-
-    with open("../sentiment/result.json", "w") as outfile:
-        json.dump(result, outfile, indent=4)
 
     return result
 
@@ -159,6 +159,32 @@ def _create_dict():
     return result
 
 
+def analyze(comments):
+    result = comments
+
+    for symbol in result:
+        symbol_object = result[symbol]
+        for comment in symbol_object["comments"]:
+            score = SentimentIntensityAnalyzer().polarity_scores(comment)
+
+            if (score["compound"] > .005) or (score["pos"] + (score["neg"]) > 0):
+                symbol_object["positive_comments"] += [comment]
+                symbol_object["positive_count"] += 1
+            elif (score["compound"] < -.005) or (score["pos"] + (score["neg"]) < 0):
+                symbol_object["negative_comments"] += [comment]
+                symbol_object["negative_count"] += 1
+            else:
+                symbol_object["neutral_comments"] += [comment]
+                symbol_object["neutral_count"] += 1
+
+    return result
+
+
+def output_result(comments):
+    with open("../sentiment/result.json", "w") as outfile:
+        json.dump(comments, outfile, indent=4)
+
+
 def run(name):
     # create subreddit instance
     subreddit = get_subreddit(name)
@@ -175,8 +201,14 @@ def run(name):
     # get all comments from the comments id
     comments = get_all_comments(comments_id)
 
-    # output comments to a json file
-    output_comments(comments, tickers)
+    # return cleaned comments in a json object
+    comments = clean_comments(comments, tickers)
+
+    # perform sentimental analysis to the comments
+    comments = analyze(comments)
+
+    # output the result to a json file
+    output_result(comments)
 
 
 if __name__ == "__main__":
