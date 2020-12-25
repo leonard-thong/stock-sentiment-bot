@@ -9,29 +9,6 @@ from csv import reader
 from datetime import datetime, timedelta
 
 
-def create_dict():
-    tickers = {}
-    with open("tickers.csv") as tickers:
-        tickers = reader(tickers)
-        header = next(tickers)
-
-        # Check file as empty
-        if header != None:
-            # Iterate over each row after the header in the csv
-            for ticker in tickers:
-                # row variable is a list that represents a row in csv
-                print(ticker[0])
-                dict[ticker[0]] = {
-                    'symbol': ticker[0],
-                    'name': ticker[1],
-                    'sector': ticker[2],
-                    'common_name': ticker[3],
-                    'comments': []
-                }
-
-    return tickers
-
-
 def get_subreddit(name):
     if name == "":
         sub = "wallstreetbets"
@@ -126,36 +103,47 @@ def _get_comments(comments_id):
     return comments
 
 
-def clean_comments(comments, tickers):
-    cleansed = []
+def output_comments(comments, tickers):
+    result = _create_dict()
 
     for comment in comments:
         for ticker in tickers:
             if _check_comment(ticker, comment['body']):
-                cleansed.append(re.sub(r"\s", " ", comment['body']))
-                break
+                result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
 
-    return cleansed
+    with open("../sentiment/result.json", "w") as outfile:
+        json.dump(result, outfile)
+
+    return result
 
 
 def _check_comment(word, body):
     return re.compile(r'\b({0})\b'.format(word), flags=re.IGNORECASE).search(body) is not None
 
 
-def output_comments(comments):
-    data_list = [["index", "comment"]]
-    for i, comment in enumerate(comments):
-        data_list.append([i, comment])
+def _create_dict():
+    result = {}
+    with open("tickers.csv") as tickers:
+        tickers = reader(tickers)
+        header = next(tickers)
 
-    with open('../sentiment/comments.csv', 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(data_list)
+        # Check file as empty
+        if header is not None:
+            # Iterate over each row after the header in the csv
+            for ticker in tickers:
+                # row variable is a list that represents a row in csv
+                result[ticker[0]] = {
+                    'symbol': ticker[0],
+                    'name': ticker[1],
+                    'sector': ticker[2],
+                    'common_name': ticker[3],
+                    'comments': []
+                }
+
+    return result
 
 
 def run(name):
-    # create result object
-    result = create_dict()
-
     # create subreddit instance
     subreddit = get_subreddit(name)
 
@@ -171,11 +159,8 @@ def run(name):
     # get all comments from the comments id
     comments = get_all_comments(comments_id)
 
-    # remove comments that did not mention any tickers
-    comments = clean_comments(comments, tickers)
-
-    # output comments to csv file
-    output_comments(comments)
+    # output comments to a json file
+    output_comments(comments, tickers)
 
 
 if __name__ == "__main__":
