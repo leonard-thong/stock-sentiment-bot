@@ -111,14 +111,15 @@ def _get_comments(comments_id):
 
 def clean_comments(comments, tickers):
     result = _create_dict()
-    confused_tickers = []
+    confusing_tickers = ["A", "AS", "ARE", "ALL", "T", "C", "DD", "F", "BEN",
+                        "J", "K", "L", "NOW", "O", "SO", "V"]
 
     for comment in comments:
         for ticker in tickers:
             if _check_comment(result[ticker]["common_name"], comment['body']):
                 result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
                 result[ticker]["total_count"] += 1
-            elif ticker not in confused_tickers:
+            elif ticker not in confusing_tickers:
                 if _check_comment(result[ticker]["symbol"], comment['body']):
                     result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
                     result[ticker]["total_count"] += 1
