@@ -5,20 +5,44 @@ import re
 import requests
 import numpy as np
 
+from csv import reader
 from datetime import datetime, timedelta
+
+
+def create_dict():
+    tickers = {}
+    with open("tickers.csv") as tickers:
+        tickers = reader(tickers)
+        header = next(tickers)
+
+        # Check file as empty
+        if header != None:
+            # Iterate over each row after the header in the csv
+            for ticker in tickers:
+                # row variable is a list that represents a row in csv
+                print(ticker[0])
+                dict[ticker[0]] = {
+                    'symbol': ticker[0],
+                    'name': ticker[1],
+                    'sector': ticker[2],
+                    'common_name': ticker[3],
+                    'comments': []
+                }
+
+    return tickers
 
 
 def get_subreddit(name):
     if name == "":
         sub = "wallstreetbets"
 
-    with open("config.json") as json_data_file:
-        data = json.load(json_data_file)
+    with open("config.json") as config:
+        config = json.load(config)
 
     # create reddit instance
-    reddit = praw.Reddit(client_id=data["login"]["client_id"], client_secret=data["login"]["client_secret"],
-                         username=data["login"]["username"], password=data["login"]["password"],
-                         user_agent=data["login"]["user_agent"])
+    reddit = praw.Reddit(client_id=config["login"]["client_id"], client_secret=config["login"]["client_secret"],
+                         username=config["login"]["username"], password=config["login"]["password"],
+                         user_agent=config["login"]["user_agent"])
 
     # create a subreddit instance
     subreddit = reddit.subreddit(name)
@@ -129,13 +153,16 @@ def output_comments(comments):
 
 
 def run(name):
+    # create result object
+    result = create_dict()
+
     # create subreddit instance
     subreddit = get_subreddit(name)
 
     # get tickers list
     tickers = get_tickers()
 
-    #get all submissions id within the last 24 hours
+    # get all submissions id within the last 24 hours
     submissions_id = get_all_submissions_id(subreddit)
 
     # get all comments id from all the submissions
