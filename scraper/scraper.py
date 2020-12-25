@@ -114,9 +114,11 @@ def output_comments(comments, tickers):
         for ticker in tickers:
             if _check_comment(result[ticker]["common_name"], comment['body']):
                 result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
+                result[ticker]["total_count"] += 1
             elif ticker not in confused_tickers:
                 if _check_comment(result[ticker]["symbol"], comment['body']):
                     result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
+                    result[ticker]["total_count"] += 1
 
     with open("../sentiment/result.json", "w") as outfile:
         json.dump(result, outfile, indent=4)
@@ -144,7 +146,14 @@ def _create_dict():
                     'name': ticker[1],
                     'sector': ticker[2],
                     'common_name': ticker[3],
-                    'comments': []
+                    'comments': [],
+                    'total_count': 0,
+                    'negative_comments': [],
+                    'negative_count': 0,
+                    'positive_comments': [],
+                    'positive_count': 0,
+                    'neutral_comments': [],
+                    'neutral_count': 0
                 }
 
     return result
