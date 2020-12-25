@@ -112,7 +112,7 @@ def output_comments(comments, tickers):
                 result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
 
     with open("../sentiment/result.json", "w") as outfile:
-        json.dump(result, outfile)
+        json.dump(result, outfile, indent=4)
 
     return result
 
