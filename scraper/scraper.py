@@ -97,19 +97,26 @@ def _get_comments(comments_id):
     try:
         html = requests.get(f'https://api.pushshift.io/reddit/comment/search?ids={comments_id}&fields=body&size=1000')
         comments = html.json()['data']
+
+        return comments
     except:
         pass
 
-    return comments
+    # return empty array if error happened
+    return []
 
 
 def output_comments(comments, tickers):
     result = _create_dict()
+    confused_tickers = []
 
     for comment in comments:
         for ticker in tickers:
-            if _check_comment(ticker, comment['body']):
+            if _check_comment(result[ticker]["common_name"], comment['body']):
                 result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
+            elif ticker not in confused_tickers:
+                if _check_comment(result[ticker]["symbol"], comment['body']):
+                    result[ticker]["comments"].append(re.sub(r"\s", " ", comment['body']))
 
     with open("../sentiment/result.json", "w") as outfile:
         json.dump(result, outfile, indent=4)
