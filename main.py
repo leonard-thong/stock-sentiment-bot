@@ -13,7 +13,7 @@ nltk.download('vader_lexicon')
 
 
 def get_subreddit(name):
-    with open("config.json") as config:
+    with open("config/config.json") as config:
         config = json.load(config)
 
     # create reddit instance
@@ -28,7 +28,7 @@ def get_subreddit(name):
 
 def get_tickers():
     tickers_list = []
-    with open("tickers.csv") as tickers:
+    with open("data/tickers.csv") as tickers:
         tickers = reader(tickers)
         header = next(tickers)
 
@@ -113,7 +113,7 @@ def _get_comments(comments_id):
 def clean_comments(comments, tickers):
     result = _create_dict()
     confusing_tickers = ["A", "AS", "ARE", "ALL", "T", "C", "DD", "F", "BEN",
-                         "J", "K", "L", "NOW", "O", "RE", "SO", "V"]
+                         "J", "K", "L", "NOW", "M", "O", "RE", "SO", "V"]
 
     for comment in comments:
         for ticker in tickers:
@@ -139,7 +139,7 @@ def _check_comment(word, body):
 
 def _create_dict():
     result = {}
-    with open("tickers.csv") as tickers:
+    with open("data/tickers.csv") as tickers:
         tickers = reader(tickers)
         header = next(tickers)
 
@@ -151,8 +151,8 @@ def _create_dict():
                 result[ticker[0]] = {
                     'symbol': ticker[0],
                     'name': ticker[1],
-                    'sector': ticker[2],
-                    'common_name': ticker[3],
+                    'common_name': ticker[2],
+                    'sector': ticker[3],
                     'comments': [],
                     'total_count': 0,
                     'negative_comments': [],
