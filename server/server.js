@@ -9,21 +9,22 @@ const app = express();
 const connectDB = async () => {
     await MongoClient.connect(mongoURI, { useUnifiedTopology: true })
         .then((client) => {
+            console.log("Connected to MongoDB...");
+
             var db = client.db("results");
 
             var query = { _id: "20201226" };
-            var result;
+            var data;
             db.collection("results")
                 .find(query)
                 .toArray(function (err, result) {
                     if (err) throw err;
 
-                    result = result;
+                    data = result[0];
                 });
 
-            console.log("Connected to MongoDB...");
             app.use("/", (req, res) => {
-                res.json(result);
+                res.jsonp(data);
             });
         })
         .catch((error) => console.error(error));
