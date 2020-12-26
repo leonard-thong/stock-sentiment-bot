@@ -1,14 +1,18 @@
 import csv
 import json
-import praw
-import re
-import requests
 import nltk
 import numpy as np
+import praw
+import pymongo
+import re
+import requests
+import urllib
 
 from csv import reader
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from pymongo import MongoClient
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
 nltk.download('vader_lexicon')
 
 
@@ -187,9 +191,34 @@ def analyze(comments):
     return result
 
 
-def output_result(comments):
-    with open("output/result.json", "w") as outfile:
-        json.dump(comments, outfile, indent=4)
+def output_result(results):
+    today = date.today()
+
+    # dd/mm/YY
+    d = today.strftime("%Y%m%d")
+
+    with open(f"output/{d}.json", "w") as outfile:
+        json.dump(results, outfile, indent=4)
+
+    with open("config/config.json") as config:
+        config = json.load(config)
+
+        username = urllib.parse.quote(config["database"]["username"])
+        password = urllib.parse.quote(config["database"]["password"])
+
+    cluster = MongoClient(
+        f'mongodb+srv://{username}:{password}@cluster0.qxcsy.mongodb.net/<dbname>?retryWrites=true&w=majority')
+    database = cluster["results"]
+    collection = database["results"]  # collections = cluster["results"]["results"]
+
+    # give results a unique identifier
+    results["_id"] = f"{d}"
+
+    try:
+        collection.insert_one(results)
+    except pymongo.errors.DuplicateKeyError:
+        # duplicate key error
+        pass
 
 
 def run(name):
@@ -212,10 +241,10 @@ def run(name):
     comments = clean_comments(comments, tickers)
 
     # perform sentimental analysis to the comments
-    comments = analyze(comments)
+    results = analyze(comments)
 
     # output the result to a json file
-    output_result(comments)
+    output_result(results)
 
 
 if __name__ == "__main__":
