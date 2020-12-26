@@ -30,15 +30,19 @@ def get_subreddit(name):
 
 
 def get_tickers():
-    with open('tickers.txt', 'r') as w:
-        tickers = w.readlines()
-        tickers_list = []
+    tickers_list = []
+    with open("tickers.csv") as tickers:
+        tickers = reader(tickers)
+        header = next(tickers)
 
-        for ticker in tickers:
-            ticker = ticker.replace('\n', '')
-            tickers_list.append(ticker)
+        # Check file as empty
+        if header is not None:
+            # Iterate over each row after the header in the csv
+            for ticker in tickers:
+                # row variable is a list that represents a row in csv
+                tickers_list.append(ticker[0])
 
-        return tickers_list
+    return tickers_list
 
 
 def get_all_submissions_id(subreddit):
