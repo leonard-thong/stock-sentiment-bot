@@ -174,10 +174,10 @@ def analyze(comments):
         for comment in symbol_object["comments"]:
             score = SentimentIntensityAnalyzer().polarity_scores(comment)
 
-            if (score["compound"] > .005) or (score["pos"] + (score["neg"]) > 0):
+            if (score["compound"] > .005) or (score["pos"] - (score["neg"]) > 0.025):
                 symbol_object["positive_comments"] += [comment]
                 symbol_object["positive_count"] += 1
-            elif (score["compound"] < -.005) or (score["pos"] + (score["neg"]) < 0):
+            elif (score["compound"] < -.005) or (score["pos"] - (score["neg"]) < -0.025):
                 symbol_object["negative_comments"] += [comment]
                 symbol_object["negative_count"] += 1
             else:
