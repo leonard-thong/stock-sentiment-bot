@@ -13,9 +13,6 @@ nltk.download('vader_lexicon')
 
 
 def get_subreddit(name):
-    if name == "":
-        sub = "wallstreetbets"
-
     with open("config.json") as config:
         config = json.load(config)
 
