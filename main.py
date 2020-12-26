@@ -188,7 +188,7 @@ def analyze(comments):
 
 
 def output_result(comments):
-    with open("data/result.json", "w") as outfile:
+    with open("output/result.json", "w") as outfile:
         json.dump(comments, outfile, indent=4)
 
 
