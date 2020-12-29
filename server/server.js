@@ -6,6 +6,8 @@ let mongoURI = `mongodb+srv://${jsonData["database"]["username"]}:${jsonData["da
 
 const app = express();
 
+app.use(express.json());
+
 const connectDB = async () => {
     await MongoClient.connect(mongoURI, { useUnifiedTopology: true })
         .then((client) => {
