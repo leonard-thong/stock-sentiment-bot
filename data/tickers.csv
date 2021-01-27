@@ -2,6 +2,7 @@ Symbol,Name,CommonName,Sector
 ADT,ADT Inc,ADT,Industrials
 ABNB,Airbnb Inc,Airbnb,Communication Services
 BABA,Alibaba Group Holding Limited,Alibaba,Consumer Discretionary
+BB, BlackBerry Limited, Blacberry, Consumer Discretionary
 GOOGL,Alphabet Inc,Alphabet,Communication Services
 AMZN,Amazon.com Inc,Amazon,Consumer Discretionary
 AMC,AMC Entertainment Holdings Inc.,AMC,Communication Services
@@ -38,6 +39,7 @@ GPS,Gap Inc,Gap,Consumer Discretionary
 GE,General Electric,General Electric,Industrials
 GNUS,Genius Brands International Inc,Genius Brands,Communication Services
 GM,General Motors,General Motors,Consumer Discretionary
+GME,Gamestop Corporation,Gamestop,Consumer Discretionary
 GPRO,GoPro Inc,GoPro,Consumer Discretionary
 HAL,Halliburton Company,Halliburton,Energy
 HL,Hecla Mining Company,Hecla,Materials
