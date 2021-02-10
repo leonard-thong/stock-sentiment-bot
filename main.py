@@ -117,7 +117,7 @@ def _get_comments(comments_id):
 def clean_comments(comments, tickers):
     result = _create_dict()
     confusing_tickers = ["A", "AM", "AS", "ARE", "ALL", "T", "C", "DD", "F", "BEN",
-                         "J", "K", "L", "NOW", "M", "O", "RE", "SO", "V"]
+                         "J", "K", "L", "NOW", "M", "O", "RE", "SAVE", "SO", "V"]
 
     for comment in comments:
         for ticker in tickers:
