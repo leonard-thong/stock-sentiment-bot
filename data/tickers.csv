@@ -60,7 +60,7 @@ MRNA,Moderna Inc,Moderna,Health Care
 NFLX,Netflix Inc.,Netflix,Communication Services
 NRZ,New Residential Investment Corporation,New Residential Investment,Real Estate
 NKE,Nike Inc,Nike,Consumer Discretionary
-Nikola,Nikola Inc,Nikola,Consumer Discretionary
+NKLA,Nikola Inc,Nikola,Consumer Discretionary
 NIO,NIO Limited,Nio,Consumer Discretionary
 NOK,Nokia Corporation,Nokia,Information Technology
 NCLH,Norweigan Cruise Line Holding Ltd,Norweigan,Consumer Discretionary
@@ -81,7 +81,8 @@ SRNE,Sorrento Therapeutics,Sorrento,Health Care
 LUV,Southwest Airlines,Southwest,Industrials
 SAVE,Spirit Airlines,Spirit,Industrials
 SQ,Square Inc,Square,Financials
-SBUX,Starbucks Corporation,Starbucks,Consumer Discretionary'
+SBUX,Starbucks Corporation,Starbucks,Consumer Discretionary
+SNDL,Sundial Growers Inc,Sundial,Health Care
 TSLA,Tesla Inc,Tesla,Consumer Discretionary
 TLRY,Tilray Inc,Tilray,Health Care
 TWTR,Twitter Inc,Twitter,Communication Services
