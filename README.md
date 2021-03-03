@@ -1,3 +1,3 @@
-# Stock Sentiment Scraper and Analyzer
+# Stock Sentiment Analyzer
 
 An application that scrapes comments from the "wallstreebets" subreddit and performs sentimental analysis to classify stocks into three separate categories (Bullish, Bearish, or Neutral).
